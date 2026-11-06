@@ -1,0 +1,12 @@
+{
+  "name": "WordQuest – رحلة الكلمات",
+  "short_name": "WordQuest",
+  "description": "لعبة كلمات عربية تفاعلية",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c1325",
+  "theme_color": "#10182d",
+  "icons": []
+}
