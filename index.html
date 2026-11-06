@@ -50,7 +50,7 @@ const puzzles=[
 {q:'ما العضو الذي يضخ الدم؟',a:'القلب',h:'يدق باستمرار في جسمك',d:'صعب'}
 ];
 const alphabet='ابتثجحخدذرزسشصضطظعغفقكلمنهويءأإآة';
-const defaults={coins:120,unlocked:1,solved:0,streak:0,stars:0,completed:[],lastDaily:'',achievements:[]};
+const defaults={coins:120,unlocked:1,solved:0,streak:0,stars:0,completed:[],lastDaily:'',achievements:[],crosswordSolvedAcross:false,crosswordSolvedDown:false};
 let state={...defaults,...JSON.parse(localStorage.getItem('wordquest-save')||'{}')},current=0,typed=[],pool=[];
 function save(){localStorage.setItem('wordquest-save',JSON.stringify(state));render()}
 function normalize(s){return s.replace(/[\u064B-\u065F\u0670\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي')}
@@ -70,7 +70,7 @@ function toast(s){let t=document.getElementById('toast');t.textContent=s;t.class
 function closeModal(){document.getElementById('modal').classList.remove('show')}
 
 const crossWords={across:{id:'across',number:1,answer:'كتاب',clue:'شيء نقرأ فيه وله صفحات',cells:[[2,0],[2,1],[2,2],[2,3]]},down:{id:'down',number:2,answer:'باب',clue:'مدخل الغرفة أو المنزل',cells:[[1,2],[2,2],[3,2]]}};
-let crossValues={},crossSolved={across:false,down:false},crossActive='across';
+let crossValues={},crossSolved={across:!!state.crosswordSolvedAcross,down:!!state.crosswordSolvedDown},crossActive='across';
 const crossLetters='ابتثجحخدذرزسشصضطظعغفقكلمنهوي';
 function startCrossword(){show('crossword');drawCrossword()}
 function crossCellKey(r,c){return r+','+c}
@@ -85,9 +85,9 @@ function drawCrossword(){
 }
 function crossClueHTML(id){let w=crossWords[id];return '<button class="cross-clue '+(crossActive===id?'selected':'')+'" onclick="crossSelect(\''+id+'\')"><b>'+w.number+'</b><span>'+w.clue+'</span><small>'+(crossSolved[id]?'✓ مكتملة':w.answer.length+' أحرف')+'</small></button>'}
 function crossSelect(id){crossActive=id;drawCrossword()}
-function crossPress(ch){let w=crossWords[crossActive];if(crossSolved[crossActive])return;let index=w.cells.findIndex(([r,c])=>!crossValues[crossCellKey(r,c)]);if(index<0){toast('امسح حرفاً أو اختر السؤال الآخر');return}let [r,c]=w.cells[index],key=crossCellKey(r,c);crossValues[key]=ch;drawCrossword();let attempt=w.cells.map(([x,y])=>crossValues[crossCellKey(x,y)]||'').join('');if(attempt.length===w.answer.length){if(normalize(attempt)===normalize(w.answer)){crossSolved[crossActive]=true;state.coins+=15;state.stars+=1;save();document.getElementById('cross-feedback').textContent='إجابة صحيحة! +15 عملة ⭐';drawCrossword();if(crossSolved.across&&crossSolved.down)document.getElementById('cross-feedback').textContent='🎉 أكملت شبكة التقاطع الأولى! +15 عملة لكل كلمة.'}else{document.getElementById('cross-feedback').textContent='ليست صحيحة، امسح الحروف وحاول مجدداً'}}}
-function crossErase(){let w=crossWords[crossActive];for(let i=w.cells.length-1;i>=0;i--){let [r,c]=w.cells[i],k=crossCellKey(r,c);if(crossValues[k]){delete crossValues[k];break}}document.getElementById('cross-feedback').textContent='';drawCrossword()}
-function crossReset(){crossValues={};crossSolved={across:false,down:false};document.getElementById('cross-feedback').textContent='';drawCrossword()}
+function crossPress(ch){let w=crossWords[crossActive];if(crossSolved[crossActive])return;let index=w.cells.findIndex(([r,c])=>!crossValues[crossCellKey(r,c)]);if(index<0){toast('امسح حرفاً أو اختر السؤال الآخر');return}let [r,c]=w.cells[index],key=crossCellKey(r,c);crossValues[key]=ch;drawCrossword();let attempt=w.cells.map(([x,y])=>crossValues[crossCellKey(x,y)]||'').join('');if(attempt.length===w.answer.length){if(normalize(attempt)===normalize(w.answer)){crossSolved[crossActive]=true;state['crosswordSolved'+(crossActive==='across'?'Across':'Down')]=true;state.coins+=15;state.stars+=1;save();document.getElementById('cross-feedback').textContent='إجابة صحيحة! +15 عملة ⭐';drawCrossword();if(crossSolved.across&&crossSolved.down)document.getElementById('cross-feedback').textContent='🎉 أكملت شبكة التقاطع الأولى! +15 عملة لكل كلمة.'}else{document.getElementById('cross-feedback').textContent='ليست صحيحة، امسح الحروف وحاول مجدداً'}}}
+function crossErase(){let w=crossWords[crossActive],other=crossWords[crossActive==='across'?'down':'across'];for(let i=w.cells.length-1;i>=0;i--){let [r,c]=w.cells[i],k=crossCellKey(r,c),locked=crossSolved[other.id]&&other.cells.some(([x,y])=>x===r&&y===c);if(crossValues[k]&&!locked){delete crossValues[k];break}}document.getElementById('cross-feedback').textContent='';drawCrossword()}
+function crossReset(){crossValues={};Object.entries(crossWords).forEach(([id,w])=>{if(crossSolved[id])w.cells.forEach(([r,c],i)=>crossValues[crossCellKey(r,c)]=w.answer[i])});document.getElementById('cross-feedback').textContent='';drawCrossword()}
 
 render();renderLevels();
 </script>
