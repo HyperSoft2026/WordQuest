@@ -138,7 +138,7 @@ function drawCrossword(){
 function crossClueHTML(id){
  const w=currentCrossPuzzle().words[id],remaining=w.cells.filter(([r,c])=>!crossValues[crossCellKey(r,c)]).length;
  const status=crossSolved[id]?'✓ مكتملة':remaining?remaining+' أحرف متبقية':'راجع الإجابة';
- return '<button class="cross-clue '+(crossActive===id?'selected':'')+'" onclick="crossSelect(\\''+id+'\\')"><b>'+w.number+'</b><span>'+w.clue+'</span><small>'+status+'</small></button>';
+ return '<button class="cross-clue '+(crossActive===id?'selected':'')+'" onclick="crossSelect(this.dataset.word)" data-word="'+id+'"><b>'+w.number+'</b><span>'+w.clue+'</span><small>'+status+'</small></button>';
 }
 function crossSelect(id){if(!currentCrossPuzzle().words[id])return;crossActive=id;drawCrossword()}
 function crossPress(ch){
