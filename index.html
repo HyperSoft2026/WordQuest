@@ -203,7 +203,9 @@ function crossHint(){
  const index=word.cells.findIndex(([r,c],i)=>normalize(crossValues[crossCellKey(r,c)]||'')!==normalize(word.answer[i]));
  if(index<0){toast('لا توجد خانة تحتاج إلى كشف');return}
  const [r,c]=word.cells[index],key=crossCellKey(r,c);
- crossValues[key]=word.answer[index];crossCursor=index+1;state.coins-=cost;
+ crossValues[key]=word.answer[index];crossCursor=index+1;
+ while(crossCursor<word.cells.length){const [nextR,nextC]=word.cells[crossCursor];if(!crossValues[crossCellKey(nextR,nextC)])break;crossCursor++}
+ state.coins-=cost;
  const attempt=word.cells.map(([x,y])=>crossValues[crossCellKey(x,y)]||'').join('');
  if(attempt.length===word.answer.length&&normalize(attempt)===normalize(word.answer)){
   crossSolved[crossActive]=true;state.coins+=15;state.stars+=1;
