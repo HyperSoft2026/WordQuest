@@ -29,7 +29,7 @@
 </section>
 <section id="crossword" class="screen"><div class="game-head"><button class="back" onclick="show('home')">→ رجوع</button><div class="game-title"><b>🧩 الكلمات المتقاطعة</b><small>شبكات عربية بكلمات أفقية وعمودية متقاطعة</small></div><div class="wallet">🪙 <span id="cross-coins">120</span></div></div><div class="game-card"><div class="eyebrow" id="cross-puzzle-title">التحدي الأول · شبكة 4 × 4</div><div class="cross-puzzle-tabs" id="cross-puzzle-tabs" role="group" aria-label="اختر شبكة الكلمات"></div><div class="crossword-board" id="cross-board" role="group" aria-label="شبكة الكلمات المتقاطعة"></div><p class="muted" style="text-align:center">اختر سؤالاً وأدخل الأحرف الناقصة فقط؛ خانات التقاطع المملوءة تُحتسب تلقائياً في الاتجاهين.</p></div><div class="game-card"><div class="section-head" style="margin-top:0"><h2>أفقياً</h2><span class="muted" id="cross-across-count">1 كلمة</span></div><div class="cross-clues" id="cross-across"></div><div class="section-head"><h2>عمودياً</h2><span class="muted" id="cross-down-count">1 كلمة</span></div><div class="cross-clues" id="cross-down"></div><div class="cross-keys" id="cross-keys"></div><div class="cross-actions"><button class="secondary" onclick="crossHint()">💡 كشف حرف · 🪙 20</button><button class="secondary" onclick="crossErase()">⌫ مسح آخر حرف</button><button class="secondary" onclick="crossReset()">إعادة الحروف</button></div><div class="feedback" id="cross-feedback" aria-live="polite"></div></div></section>
 <section id="achievements" class="screen"><div class="eyebrow">🏆 إنجازاتك</div><h2 style="margin:4px 0 16px">وسام الأبطال</h2><div id="achievements-list"></div></section>
-<section id="profile" class="screen"><div class="hero" style="text-align:center"><div style="font-size:50px">🧑‍🚀</div><h2>مستكشف الكلمات</h2><p>واصل اللعب لتصبح أسطورة WordQuest!</p></div><div class="stats"><div class="stat"><b id="profile-coins">120</b><span>العملات</span></div><div class="stat"><b id="profile-solved">0</b><span>الألغاز</span></div><div class="stat"><b id="profile-stars">0 ⭐</b><span>النجوم</span></div></div><div class="section-head"><h2>⚙️ الإعدادات</h2></div><div class="list-card"><div class="grow"><b>المؤثرات الصوتية</b><small>الأصوات قيد التطوير</small></div><span>🔊</span></div><div class="list-card"><div class="grow"><b>حفظ التقدم</b><small>يُحفظ تقدمك تلقائياً على هذا الجهاز</small></div><span>💾</span></div></section>
+<section id="profile" class="screen"><div class="hero" style="text-align:center"><div style="font-size:50px">🧑‍🚀</div><h2>مستكشف الكلمات</h2><p>واصل اللعب لتصبح أسطورة WordQuest!</p></div><div class="stats"><div class="stat"><b id="profile-coins">120</b><span>العملات</span></div><div class="stat"><b id="profile-solved">0</b><span>الألغاز</span></div><div class="stat"><b id="profile-stars">0 ⭐</b><span>النجوم</span></div></div><div class="section-head"><h2>⚙️ الإعدادات</h2></div><div class="list-card"><div class="grow"><b>المؤثرات الصوتية</b><small id="sound-status">المؤثرات مفعّلة على هذا الجهاز</small></div><button class="secondary" id="sound-toggle" type="button" onclick="toggleSound()" aria-pressed="true">إيقاف الصوت</button></div><div class="list-card"><div class="grow"><b>حفظ التقدم</b><small>يُحفظ تقدمك تلقائياً على هذا الجهاز</small></div><span>💾</span></div></section>
 </main>
 </div>
 <nav class="bottom"><button class="nav active" data-screen="home" onclick="show('home')"><span>🏠</span>الرئيسية</button><button class="nav" data-screen="levels" onclick="show('levels')"><span>🧩</span>المراحل</button><button class="nav" data-screen="achievements" onclick="show('achievements')"><span>🏆</span>الإنجازات</button><button class="nav" data-screen="profile" onclick="show('profile')"><span>👤</span>حسابي</button></nav>
@@ -50,20 +50,40 @@ const puzzles=[
 {q:'ما العضو الذي يضخ الدم؟',a:'القلب',h:'يدق باستمرار في جسمك',d:'صعب'}
 ];
 const alphabet='ابتثجحخدذرزسشصضطظعغفقكلمنهويءأإآة';
-const defaults={coins:120,unlocked:1,solved:0,streak:0,stars:0,completed:[],lastDaily:'',achievements:[],crosswordSolvedAcross:false,crosswordSolvedDown:false,crosswordProgress:{}};
+const defaults={coins:120,unlocked:1,solved:0,streak:0,stars:0,completed:[],lastDaily:'',achievements:[],crosswordSolvedAcross:false,crosswordSolvedDown:false,crosswordProgress:{},sfxEnabled:true};
 let state={...defaults,...JSON.parse(localStorage.getItem('wordquest-save')||'{}')},current=0,typed=[],pool=[];
 function save(){localStorage.setItem('wordquest-save',JSON.stringify(state));render()}
+let sfxContext=null;
+function updateSoundSetting(){const button=document.getElementById('sound-toggle'),status=document.getElementById('sound-status');if(!button)return;button.textContent=state.sfxEnabled?'إيقاف الصوت':'تشغيل الصوت';button.setAttribute('aria-pressed',String(!!state.sfxEnabled));if(status)status.textContent=state.sfxEnabled?'المؤثرات مفعّلة على هذا الجهاز':'المؤثرات مكتومة على هذا الجهاز'}
+function toggleSound(){state.sfxEnabled=!state.sfxEnabled;save();toast(state.sfxEnabled?'🔊 تم تشغيل المؤثرات':'🔇 تم إيقاف المؤثرات')}
+function playSfx(kind){
+ if(!state.sfxEnabled)return;
+ const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+ if(!AudioContextClass)return;
+ const patterns={tap:[[620,0,.045]],success:[[523,0,.09],[784,.1,.14]],error:[[190,0,.12]],hint:[[660,0,.07],[880,.08,.09]],reward:[[587,0,.08],[740,.09,.08],[988,.18,.16]]};
+ const pattern=patterns[kind];if(!pattern)return;
+ try{
+  if(!sfxContext)sfxContext=new AudioContextClass();
+  if(sfxContext.state==='suspended')sfxContext.resume().catch(()=>{});
+  pattern.forEach(([frequency,offset,duration])=>{
+   const start=sfxContext.currentTime+offset,oscillator=sfxContext.createOscillator(),gain=sfxContext.createGain();
+   oscillator.type=kind==='error'?'triangle':'sine';oscillator.frequency.setValueAtTime(frequency,start);
+   gain.gain.setValueAtTime(.0001,start);gain.gain.exponentialRampToValueAtTime(.045,start+.012);gain.gain.exponentialRampToValueAtTime(.0001,start+duration);
+   oscillator.connect(gain);gain.connect(sfxContext.destination);oscillator.start(start);oscillator.stop(start+duration+.01);
+  });
+ }catch(error){}
+}
 function normalize(s){return s.replace(/[\u064B-\u065F\u0670\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي')}
 function nextLevel(){return Math.min(state.unlocked,puzzles.length)}
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===id));document.querySelectorAll('.nav').forEach(n=>n.classList.toggle('active',n.dataset.screen===id));if(id==='levels')renderLevels();if(id==='achievements')renderAchievements();render()}
-function render(){document.getElementById('coins').textContent=state.coins;document.getElementById('stat-level').textContent=state.unlocked;document.getElementById('stat-solved').textContent=state.solved;document.getElementById('stat-streak').textContent=state.streak+' 🔥';document.getElementById('profile-coins').textContent=state.coins;document.getElementById('profile-solved').textContent=state.solved;document.getElementById('profile-stars').textContent=state.stars+' ⭐';let p=Math.round(state.completed.length/puzzles.length*100);document.getElementById('progress-label').textContent=p+'%';document.getElementById('progress-bar').style.width=p+'%';document.getElementById('progress-copy').textContent=state.completed.length+' من '+puzzles.length+' مراحل مكتملة';document.getElementById('daily-btn').disabled=state.lastDaily===new Date().toDateString();document.getElementById('daily-btn').textContent=state.lastDaily===new Date().toDateString()?'تم الاستلام':'استلام';document.getElementById('game-coins').textContent=state.coins}
+function render(){document.getElementById('coins').textContent=state.coins;document.getElementById('stat-level').textContent=state.unlocked;document.getElementById('stat-solved').textContent=state.solved;document.getElementById('stat-streak').textContent=state.streak+' 🔥';document.getElementById('profile-coins').textContent=state.coins;document.getElementById('profile-solved').textContent=state.solved;document.getElementById('profile-stars').textContent=state.stars+' ⭐';let p=Math.round(state.completed.length/puzzles.length*100);document.getElementById('progress-label').textContent=p+'%';document.getElementById('progress-bar').style.width=p+'%';document.getElementById('progress-copy').textContent=state.completed.length+' من '+puzzles.length+' مراحل مكتملة';document.getElementById('daily-btn').disabled=state.lastDaily===new Date().toDateString();document.getElementById('daily-btn').textContent=state.lastDaily===new Date().toDateString()?'تم الاستلام':'استلام';document.getElementById('game-coins').textContent=state.coins;updateSoundSetting()}
 function renderLevels(){document.getElementById('levels-grid').innerHTML=puzzles.map((p,i)=>{let n=i+1,done=state.completed.includes(n),locked=n>state.unlocked;return '<button class="level '+(locked?'locked':'')+'" '+(locked?'disabled':'onclick="startLevel('+(n)+')"')+'><div class="num">'+(done?'✓':locked?'🔒':n)+'</div><b>المرحلة '+n+'</b><small>'+(done?'مكتملة':p.d)+' · '+(locked?'مقفلة':'متاحة')+'</small></button>'}).join('')}
 function startLevel(n){if(n>state.unlocked)return;current=n-1;typed=[];const p=puzzles[current];pool=[...new Set([...p.a.split(''),...Array.from({length:Math.max(5,10-p.a.length)},()=>alphabet[Math.floor(Math.random()*alphabet.length)])])].sort(()=>Math.random()-.5);document.getElementById('game-level').textContent='المرحلة '+n;document.getElementById('question').textContent=p.q;document.getElementById('hintline').textContent='تلميح: '+p.h+' · '+p.a.length+' أحرف';document.getElementById('difficulty').textContent='⭐ '+p.d;document.getElementById('question-count').textContent='لغز '+n+' / '+puzzles.length;document.getElementById('feedback').textContent='';drawGame();show('game')}
 function drawGame(){let p=puzzles[current];document.getElementById('answer').innerHTML=Array.from({length:p.a.length},(_,i)=>'<div class="slot '+(typed[i]?'filled':'')+'">'+(typed[i]||'')+'</div>').join('');document.getElementById('keyboard').innerHTML=pool.map((ch,i)=>'<button class="key" '+(ch.used?'disabled':'')+' onclick="press('+i+')">'+ch+'</button>').join('')}
-function press(i){let p=puzzles[current];if(typed.length>=p.a.length||!pool[i])return;typed.push(pool[i]);pool.splice(i,1);drawGame();if(typed.length===p.a.length){if(normalize(typed.join(''))===normalize(p.a)){setTimeout(win,220)}else{document.getElementById('feedback').textContent='ليست الإجابة الصحيحة، حاول مرة أخرى';setTimeout(()=>{typed=[];pool=[...new Set([...p.a.split(''),...Array.from({length:Math.max(5,10-p.a.length)},()=>alphabet[Math.floor(Math.random()*alphabet.length)])])].sort(()=>Math.random()-.5);drawGame()},850)}}}
-function win(){let n=current+1;if(!state.completed.includes(n)){state.completed.push(n);state.solved++;state.coins+=20;state.stars+=3;state.streak++;state.unlocked=Math.max(state.unlocked,Math.min(puzzles.length,n+1));checkAchievements();save()}document.getElementById('modal-icon').textContent='🏆';document.getElementById('modal-title').textContent='أحسنت! إجابة صحيحة';document.getElementById('modal-copy').textContent='ربحت 20 عملة و3 نجوم. استمر في التحدي!';document.getElementById('modal-btn').textContent=n===puzzles.length?'إنهاء الرحلة':'المرحلة التالية';document.getElementById('modal-btn').onclick=()=>{closeModal();if(n<puzzles.length)startLevel(n+1);else show('levels')};document.getElementById('modal').classList.add('show')}
+function press(i){let p=puzzles[current];if(typed.length>=p.a.length||!pool[i])return;typed.push(pool[i]);pool.splice(i,1);playSfx('tap');drawGame();if(typed.length===p.a.length){if(normalize(typed.join(''))===normalize(p.a)){setTimeout(win,220)}else{playSfx('error');document.getElementById('feedback').textContent='ليست الإجابة الصحيحة، حاول مرة أخرى';setTimeout(()=>{typed=[];pool=[...new Set([...p.a.split(''),...Array.from({length:Math.max(5,10-p.a.length)},()=>alphabet[Math.floor(Math.random()*alphabet.length)])])].sort(()=>Math.random()-.5);drawGame()},850)}}}
+function win(){playSfx('success');let n=current+1;if(!state.completed.includes(n)){state.completed.push(n);state.solved++;state.coins+=20;state.stars+=3;state.streak++;state.unlocked=Math.max(state.unlocked,Math.min(puzzles.length,n+1));checkAchievements();save()}document.getElementById('modal-icon').textContent='🏆';document.getElementById('modal-title').textContent='أحسنت! إجابة صحيحة';document.getElementById('modal-copy').textContent='ربحت 20 عملة و3 نجوم. استمر في التحدي!';document.getElementById('modal-btn').textContent=n===puzzles.length?'إنهاء الرحلة':'المرحلة التالية';document.getElementById('modal-btn').onclick=()=>{closeModal();if(n<puzzles.length)startLevel(n+1);else show('levels')};document.getElementById('modal').classList.add('show')}
 function useHint(type){let cost=type==='letter'?15:type==='remove'?10:35;if(state.coins<cost){toast('عملاتك لا تكفي لهذا التلميح');return}state.coins-=cost;let p=puzzles[current];if(type==='letter'){let idx=typed.length;typed.push(p.a[idx]);toast('تم كشف الحرف التالي')}else if(type==='remove'){typed=[];pool=[...new Set([...p.a.split(''),...Array.from({length:Math.max(5,10-p.a.length)},()=>alphabet[Math.floor(Math.random()*alphabet.length)])])].sort(()=>Math.random()-.5);toast('تمت إعادة ترتيب الإجابة')}else{typed=p.a.split('');drawGame();save();setTimeout(win,300);return}drawGame();save()}
-function claimDaily(){if(state.lastDaily===new Date().toDateString())return;state.lastDaily=new Date().toDateString();state.coins+=25;save();toast('🎁 استلمت 25 عملة!')}
+function claimDaily(){if(state.lastDaily===new Date().toDateString())return;state.lastDaily=new Date().toDateString();state.coins+=25;save();playSfx('reward');toast('🎁 استلمت 25 عملة!')}
 function checkAchievements(){let checks=[['first','البداية القوية','أكمل أول مرحلة',state.solved>=1],['five','محب الكلمات','أكمل 5 مراحل',state.solved>=5],['ten','عبقري الكلمات','أكمل 10 مراحل',state.solved>=10]];checks.forEach(x=>{if(x[3]&&!state.achievements.includes(x[0])){state.achievements.push(x[0]);state.coins+=10}})}
 function renderAchievements(){let all=[['first','🌟','البداية القوية','أكمل أول مرحلة'],['five','🧠','محب الكلمات','أكمل 5 مراحل'],['ten','👑','عبقري الكلمات','أكمل 10 مراحل']];document.getElementById('achievements-list').innerHTML=all.map(a=>'<div class="list-card"><div style="font-size:27px">'+a[1]+'</div><div class="grow"><b>'+a[2]+'</b><small>'+a[3]+'</small></div><span>'+(state.achievements.includes(a[0])?'✅':'🔒')+'</span></div>').join('')}
 function toast(s){let t=document.getElementById('toast');t.textContent=s;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2100)}
@@ -184,7 +204,7 @@ function crossPress(ch){
  for(let offset=0;offset<w.cells.length;offset++){const candidate=(crossCursor+offset)%w.cells.length,[r,c]=w.cells[candidate];if(!crossValues[crossCellKey(r,c)]){index=candidate;break}}
  if(index<0){toast('كل الخانات ممتلئة؛ امسح حرفاً للمحاولة مجدداً');return}
  const [r,c]=w.cells[index],key=crossCellKey(r,c);
- crossValues[key]=ch;crossCursor=index+1;
+ crossValues[key]=ch;playSfx('tap');crossCursor=index+1;
  while(crossCursor<w.cells.length){const [x,y]=w.cells[crossCursor];if(!crossValues[crossCellKey(x,y)])break;crossCursor++}
  storeCrossProgress();drawCrossword();
  const attempt=w.cells.map(([x,y])=>crossValues[crossCellKey(x,y)]||'').join('');
@@ -193,7 +213,7 @@ function crossPress(ch){
    crossSolved[crossActive]=true;state.coins+=15;state.stars+=1;storeCrossProgress();save();drawCrossword();
    const allDone=Object.values(crossSolved).every(Boolean);
    document.getElementById('cross-feedback').textContent=allDone?'🎉 أكملت هذه الشبكة! حصلت على مكافآت جميع الكلمات.':'إجابة صحيحة! +15 عملة ⭐';
-  }else document.getElementById('cross-feedback').textContent='ليست الإجابة الصحيحة، امسح حرفاً وحاول مجدداً';
+  }else{playSfx('error');document.getElementById('cross-feedback').textContent='ليست الإجابة الصحيحة، امسح حرفاً وحاول مجدداً';}
  }
 }
 function crossHint(){
@@ -205,10 +225,10 @@ function crossHint(){
  const [r,c]=word.cells[index],key=crossCellKey(r,c);
  crossValues[key]=word.answer[index];crossCursor=index+1;
  while(crossCursor<word.cells.length){const [nextR,nextC]=word.cells[crossCursor];if(!crossValues[crossCellKey(nextR,nextC)])break;crossCursor++}
- state.coins-=cost;
+ state.coins-=cost;playSfx('hint');
  const attempt=word.cells.map(([x,y])=>crossValues[crossCellKey(x,y)]||'').join('');
  if(attempt.length===word.answer.length&&normalize(attempt)===normalize(word.answer)){
-  crossSolved[crossActive]=true;state.coins+=15;state.stars+=1;
+  crossSolved[crossActive]=true;state.coins+=15;state.stars+=1;playSfx('success');
  }
  storeCrossProgress();save();drawCrossword();
  document.getElementById('cross-feedback').textContent='💡 تم كشف حرف صحيح مقابل 20 عملة';
