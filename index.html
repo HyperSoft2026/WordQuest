@@ -117,8 +117,18 @@ const crosswordPuzzles=[
   down2:{id:'down2',number:5,answer:'تراب',clue:'مادة تغطي سطح الأرض',cells:[[0,2],[1,2],[2,2],[3,2]]},
   down3:{id:'down3',number:6,answer:'لبن',clue:'شراب أبيض يُصنع من الحليب',cells:[[3,1],[4,1],[5,1]]},
   down4:{id:'down4',number:7,answer:'ثمر',clue:'ما تنتجه الأشجار من فاكهة',cells:[[3,3],[4,3],[5,3]]}
+ }},
+ {id:'daily-vocabulary',title:'مفردات الحياة',size:7,rows:7,cols:6,words:{
+  across:{id:'across',number:1,answer:'خبز',clue:'طعام يصنع من الدقيق',cells:[[0,0],[0,1],[0,2]]},
+  down:{id:'down',number:2,answer:'باب',clue:'مدخل الغرفة أو المنزل',cells:[[0,1],[1,1],[2,1]]},
+  across2:{id:'across2',number:3,answer:'ماء',clue:'سائل ضروري للحياة',cells:[[1,3],[1,4],[1,5]]},
+  down2:{id:'down2',number:3,answer:'معلم',clue:'شخص يشرح الدروس للطلاب',cells:[[1,3],[2,3],[3,3],[4,3]]},
+  across3:{id:'across3',number:4,answer:'ربيع',clue:'فصل تتفتح فيه الأزهار',cells:[[2,0],[2,1],[2,2],[2,3]]},
+  down3:{id:'down3',number:4,answer:'رمل',clue:'حبيبات صغيرة على الشاطئ',cells:[[2,0],[3,0],[4,0]]},
+  across4:{id:'across4',number:5,answer:'موز',clue:'فاكهة صفراء طويلة',cells:[[4,3],[4,4],[4,5]]},
+  down4:{id:'down4',number:6,answer:'ولد',clue:'طفل ذكر',cells:[[4,4],[5,4],[6,4]]}
  }}
-];
+]; 
 let crossPuzzleIndex=0,crossValues={},crossSolved={},crossActive='across',crossCursor=0;
 function crossWordEntries(){return Object.entries(currentCrossPuzzle().words)}
 const crossAlphabet=Array.from('ابتثجحخدذرزسشصضطظعغفقكلمنهويءأإآة');
