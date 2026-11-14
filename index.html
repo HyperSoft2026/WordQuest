@@ -131,6 +131,18 @@ const crosswordPuzzles=[
 ]; 
 let crossPuzzleIndex=0,crossValues={},crossSolved={},crossActive='across',crossCursor=0;
 function crossWordEntries(){return Object.entries(currentCrossPuzzle().words)}
+function crossCheckCompletedWords(withSound=true){
+ const completed=[];
+ crossWordEntries().forEach(([id,word])=>{
+  if(crossSolved[id])return;
+  const attempt=word.cells.map(([r,c])=>crossValues[crossCellKey(r,c)]||'').join('');
+  if(attempt.length===word.answer.length&&normalize(attempt)===normalize(word.answer)){
+   crossSolved[id]=true;state.coins+=15;state.stars+=1;completed.push(id);
+   if(withSound)playSfx('success');
+  }
+ });
+ return completed;
+}
 const crossAlphabet=Array.from('ابتثجحخدذرزسشصضطظعغفقكلمنهويءأإآة');
 function currentCrossPuzzle(){return crosswordPuzzles[crossPuzzleIndex]}
 function crossCellKey(r,c){return r+','+c}
@@ -153,6 +165,8 @@ function loadCrossProgress(){
   if(crossSolved[id])w.cells.forEach(([r,c],i)=>crossValues[crossCellKey(r,c)]=w.answer[i]);
  });
  crossCursor=crossFirstEmptyIndex(crossActive);
+ const repaired=crossCheckCompletedWords(false);
+ if(repaired.length){storeCrossProgress();save();}
 }
 function storeCrossProgress(){
  state.crosswordProgress=state.crosswordProgress||{};
@@ -216,15 +230,17 @@ function crossPress(ch){
  const [r,c]=w.cells[index],key=crossCellKey(r,c);
  crossValues[key]=ch;playSfx('tap');crossCursor=index+1;
  while(crossCursor<w.cells.length){const [x,y]=w.cells[crossCursor];if(!crossValues[crossCellKey(x,y)])break;crossCursor++}
+ const completed=crossCheckCompletedWords();
  storeCrossProgress();drawCrossword();
- const attempt=w.cells.map(([x,y])=>crossValues[crossCellKey(x,y)]||'').join('');
- if(attempt.length===w.answer.length){
-  if(normalize(attempt)===normalize(w.answer)){
-   crossSolved[crossActive]=true;state.coins+=15;state.stars+=1;storeCrossProgress();save();drawCrossword();
-   const allDone=Object.values(crossSolved).every(Boolean);
-   document.getElementById('cross-feedback').textContent=allDone?'🎉 أكملت هذه الشبكة! حصلت على مكافآت جميع الكلمات.':'إجابة صحيحة! +15 عملة ⭐';
-  }else{playSfx('error');document.getElementById('cross-feedback').textContent='ليست الإجابة الصحيحة، امسح حرفاً وحاول مجدداً';}
+ if(completed.length){
+  save();drawCrossword();
+  const allDone=Object.values(crossSolved).every(Boolean);
+  const reward=completed.length*15;
+  document.getElementById('cross-feedback').textContent=allDone?'🎉 أكملت هذه الشبكة بالكامل!':completed.length===1?'إجابة صحيحة! +15 عملة ⭐':'اكتملت '+completed.length+' كلمات بالتقاطع! +'+reward+' عملة ⭐';
+  return;
  }
+ const attempt=w.cells.map(([x,y])=>crossValues[crossCellKey(x,y)]||'').join('');
+ if(attempt.length===w.answer.length){playSfx('error');document.getElementById('cross-feedback').textContent='ليست الإجابة الصحيحة، امسح حرفاً وحاول مجدداً';}
 }
 function crossHint(){
  const word=currentCrossPuzzle().words[crossActive],cost=20;
@@ -236,12 +252,9 @@ function crossHint(){
  crossValues[key]=word.answer[index];crossCursor=index+1;
  while(crossCursor<word.cells.length){const [nextR,nextC]=word.cells[crossCursor];if(!crossValues[crossCellKey(nextR,nextC)])break;crossCursor++}
  state.coins-=cost;playSfx('hint');
- const attempt=word.cells.map(([x,y])=>crossValues[crossCellKey(x,y)]||'').join('');
- if(attempt.length===word.answer.length&&normalize(attempt)===normalize(word.answer)){
-  crossSolved[crossActive]=true;state.coins+=15;state.stars+=1;playSfx('success');
- }
+ const completed=crossCheckCompletedWords();
  storeCrossProgress();save();drawCrossword();
- document.getElementById('cross-feedback').textContent='💡 تم كشف حرف صحيح مقابل 20 عملة';
+ document.getElementById('cross-feedback').textContent=completed.length?'💡 التلميح أكمل '+completed.length+' كلمة؛ أضيفت مكافأتها':'💡 تم كشف حرف صحيح مقابل 20 عملة';
 }
 function crossErase(){
  if(crossSolved[crossActive]){toast('هذه الكلمة مكتملة بالفعل');return}
