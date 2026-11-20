@@ -27,7 +27,7 @@
 <div class="keyboard" id="keyboard"></div>
 <div class="tools"><button class="tool" onclick="useHint('letter')">💡 كشف حرف <span>🪙 15</span></button><button class="tool" onclick="useHint('remove')">🧹 حذف أحرف <span>🪙 10</span></button><button class="tool" onclick="useHint('answer')">✨ حل اللغز <span>🪙 35</span></button></div>
 </section>
-<section id="crossword" class="screen"><div class="game-head"><button class="back" onclick="show('home')">→ رجوع</button><div class="game-title"><b>🧩 الكلمات المتقاطعة</b><small>شبكات عربية بكلمات أفقية وعمودية متقاطعة</small></div><div class="wallet">🪙 <span id="cross-coins">120</span></div></div><div class="game-card"><div class="eyebrow" id="cross-puzzle-title">التحدي الأول · شبكة 4 × 4</div><div class="cross-progress"><div class="cross-progress-head"><span id="cross-progress-label">0 / 2 كلمات مكتملة</span><span id="cross-progress-percent">0%</span></div><div class="cross-progress-track" id="cross-progress-bar" role="progressbar" aria-label="تقدم الشبكة" aria-valuemin="0" aria-valuemax="2" aria-valuenow="0"><div class="cross-progress-fill" id="cross-progress-fill"></div></div></div><div class="cross-puzzle-tabs" id="cross-puzzle-tabs" role="group" aria-label="اختر شبكة الكلمات"></div><div class="cross-board-scroll" role="region" tabindex="0" aria-label="شبكة الكلمات المتقاطعة؛ مرّر أفقياً لعرض جميع الأعمدة"><div class="crossword-board" id="cross-board" role="group" aria-label="خلايا الكلمات المتقاطعة"></div></div><p class="muted" style="text-align:center">اختر سؤالاً وأدخل الأحرف الناقصة فقط؛ خانات التقاطع المملوءة تُحتسب تلقائياً في الاتجاهين.</p></div><div class="game-card"><div class="section-head" style="margin-top:0"><h2>أفقياً</h2><span class="muted" id="cross-across-count">1 كلمة</span></div><div class="cross-clues" id="cross-across"></div><div class="section-head"><h2>عمودياً</h2><span class="muted" id="cross-down-count">1 كلمة</span></div><div class="cross-clues" id="cross-down"></div><div class="cross-keys" id="cross-keys"></div><div class="cross-actions"><button class="secondary" onclick="crossHint()">💡 كشف حرف · 🪙 20</button><button class="secondary" onclick="crossErase()">⌫ مسح آخر حرف</button><button class="secondary" onclick="crossReset()">إعادة الحروف</button></div><div class="feedback" id="cross-feedback" aria-live="polite"></div></div></section>
+<section id="crossword" class="screen"><div class="game-head"><button class="back" onclick="show('home')">→ رجوع</button><div class="game-title"><b>🧩 الكلمات المتقاطعة</b><small>شبكات عربية بكلمات أفقية وعمودية متقاطعة</small></div><div class="wallet">🪙 <span id="cross-coins">120</span></div></div><div class="game-card"><div class="eyebrow" id="cross-puzzle-title">التحدي الأول · شبكة 4 × 4</div><div class="cross-progress"><div class="cross-progress-head"><span id="cross-progress-label">0 / 2 كلمات مكتملة</span><span id="cross-progress-percent">0%</span></div><div class="cross-progress-track" id="cross-progress-bar" role="progressbar" aria-label="تقدم الشبكة" aria-valuemin="0" aria-valuemax="2" aria-valuenow="0"><div class="cross-progress-fill" id="cross-progress-fill"></div></div></div><div class="cross-puzzle-tabs" id="cross-puzzle-tabs" role="group" aria-label="اختر شبكة الكلمات"></div><div class="cross-board-scroll" role="region" tabindex="0" aria-label="شبكة الكلمات المتقاطعة؛ مرّر أفقياً لعرض جميع الأعمدة"><div class="crossword-board" id="cross-board" role="group" aria-label="خلايا الكلمات المتقاطعة"></div></div><p class="muted" style="text-align:center">اختر سؤالاً وأدخل الحروف؛ المس الخانة الممتلئة لتصحيحها مباشرة، مع حماية حروف الكلمات المكتملة.</p></div><div class="game-card"><div class="section-head" style="margin-top:0"><h2>أفقياً</h2><span class="muted" id="cross-across-count">1 كلمة</span></div><div class="cross-clues" id="cross-across"></div><div class="section-head"><h2>عمودياً</h2><span class="muted" id="cross-down-count">1 كلمة</span></div><div class="cross-clues" id="cross-down"></div><div class="cross-keys" id="cross-keys"></div><div class="cross-actions"><button class="secondary" onclick="crossHint()">💡 كشف حرف · 🪙 20</button><button class="secondary" onclick="crossErase()">⌫ مسح آخر حرف</button><button class="secondary" onclick="crossReset()">إعادة الحروف</button></div><div class="feedback" id="cross-feedback" aria-live="polite"></div></div></section>
 <section id="achievements" class="screen"><div class="eyebrow">🏆 إنجازاتك</div><h2 style="margin:4px 0 16px">وسام الأبطال</h2><div id="achievements-list"></div></section>
 <section id="profile" class="screen"><div class="hero" style="text-align:center"><div style="font-size:50px">🧑‍🚀</div><h2>مستكشف الكلمات</h2><p>واصل اللعب لتصبح أسطورة WordQuest!</p></div><div class="stats"><div class="stat"><b id="profile-coins">120</b><span>العملات</span></div><div class="stat"><b id="profile-solved">0</b><span>الألغاز</span></div><div class="stat"><b id="profile-stars">0 ⭐</b><span>النجوم</span></div></div><div class="section-head"><h2>⚙️ الإعدادات</h2></div><div class="list-card"><div class="grow"><b>المؤثرات الصوتية</b><small id="sound-status">المؤثرات مفعّلة على هذا الجهاز</small></div><button class="secondary" id="sound-toggle" type="button" onclick="toggleSound()" aria-pressed="true">إيقاف الصوت</button></div><div class="list-card"><div class="grow"><b>حفظ التقدم</b><small>يُحفظ تقدمك تلقائياً على هذا الجهاز</small></div><span>💾</span></div></section>
 </main>
@@ -251,16 +251,27 @@ function crossCellSelect(r,c){
  if(matches.includes(crossActive)&&matches.length>1)crossActive=matches[(matches.indexOf(crossActive)+1)%matches.length];
  else crossActive=matches[0];
  const word=currentCrossPuzzle().words[crossActive],index=word.cells.findIndex(([x,y])=>x===r&&y===c);
- crossCursor=index+(crossValues[crossCellKey(r,c)]?1:0);
- while(crossCursor<word.cells.length){const [x,y]=word.cells[crossCursor];if(!crossValues[crossCellKey(x,y)])break;crossCursor++}
+ crossCursor=index;
  drawCrossword();
+}
+function crossCellLocked(r,c,wordId){
+ return crossWordEntries().some(([otherId,other])=>otherId!==wordId&&crossSolved[otherId]&&other.cells.some(([x,y])=>x===r&&y===c));
 }
 function crossPress(ch){
  const w=currentCrossPuzzle().words[crossActive];
  if(crossSolved[crossActive])return;
  let index=-1;
- for(let offset=0;offset<w.cells.length;offset++){const candidate=(crossCursor+offset)%w.cells.length,[r,c]=w.cells[candidate];if(!crossValues[crossCellKey(r,c)]){index=candidate;break}}
- if(index<0){toast('كل الخانات ممتلئة؛ امسح حرفاً للمحاولة مجدداً');return}
+ if(crossCursor<w.cells.length){
+  const [r,c]=w.cells[crossCursor];
+  if(!crossCellLocked(r,c,crossActive))index=crossCursor;
+ }
+ if(index<0){
+  for(let offset=0;offset<w.cells.length;offset++){
+   const candidate=(Math.max(0,crossCursor)+offset)%w.cells.length,[r,c]=w.cells[candidate],key=crossCellKey(r,c);
+   if(!crossValues[key]&&!crossCellLocked(r,c,crossActive)){index=candidate;break}
+  }
+ }
+ if(index<0){toast('لا توجد خانة متاحة للتعديل في هذه الكلمة');return}
  const [r,c]=w.cells[index],key=crossCellKey(r,c);
  crossValues[key]=ch;playSfx('tap');crossCursor=index+1;
  while(crossCursor<w.cells.length){const [x,y]=w.cells[crossCursor];if(!crossValues[crossCellKey(x,y)])break;crossCursor++}
@@ -293,8 +304,11 @@ function crossHint(){
 function crossErase(){
  if(crossSolved[crossActive]){toast('هذه الكلمة مكتملة بالفعل');return}
  const puzzle=currentCrossPuzzle(),w=puzzle.words[crossActive];
- for(let i=Math.min(crossCursor-1,w.cells.length-1);i>=0;i--){
-  const [r,c]=w.cells[i],key=crossCellKey(r,c),locked=crossWordEntries().some(([otherId,other])=>otherId!==crossActive&&crossSolved[otherId]&&other.cells.some(([x,y])=>x===r&&y===c));
+ let start=Math.min(crossCursor,w.cells.length-1);
+ if(start<0)start=w.cells.length-1;
+ if(start>=0){const [r,c]=w.cells[start];if(!crossValues[crossCellKey(r,c)]||crossCellLocked(r,c,crossActive))start--;}
+ for(let i=start;i>=0;i--){
+  const [r,c]=w.cells[i],key=crossCellKey(r,c),locked=crossCellLocked(r,c,crossActive);
   if(crossValues[key]&&!locked){delete crossValues[key];crossCursor=i;break}
  }
  storeCrossProgress();document.getElementById('cross-feedback').textContent='';drawCrossword();
