@@ -220,6 +220,7 @@ function drawCrossword(){
   }else markup+='<div class="cross-cell block" aria-hidden="true"></div>';
  }
  board.innerHTML=markup;
+ if(document.getElementById('crossword').classList.contains('active'))board.querySelector('.cross-cell.cursor')?.focus({preventScroll:true});
  document.getElementById('cross-puzzle-title').textContent=puzzle.title+' · شبكة '+(puzzle.rows||puzzle.size)+' × '+(puzzle.cols||puzzle.size);
  const totalWords=crossWordEntries().length,solvedWords=crossWordEntries().filter(([id])=>!!crossSolved[id]).length,progressPercent=totalWords?Math.round(solvedWords/totalWords*100):0;
  document.getElementById('cross-progress-label').textContent=solvedWords+' / '+totalWords+' كلمات مكتملة';
@@ -253,6 +254,37 @@ function crossCellSelect(r,c){
  const word=currentCrossPuzzle().words[crossActive],index=word.cells.findIndex(([x,y])=>x===r&&y===c);
  crossCursor=index;
  drawCrossword();
+}
+function crossMoveCursor(key){
+ const word=currentCrossPuzzle().words[crossActive];
+ if(!word||!word.cells.length)return false;
+ let delta=0;
+ if(crossActive.startsWith('across')){
+  if(key==='ArrowLeft')delta=1;
+  else if(key==='ArrowRight')delta=-1;
+  else return false;
+ }else{
+  if(key==='ArrowDown')delta=1;
+  else if(key==='ArrowUp')delta=-1;
+  else return false;
+ }
+ const current=Math.min(Math.max(crossCursor,0),word.cells.length-1);
+ const next=Math.max(0,Math.min(word.cells.length-1,current+delta));
+ if(next!==current){crossCursor=next;drawCrossword();}
+ return true;
+}
+function crossToggleDirection(){
+ const word=currentCrossPuzzle().words[crossActive];
+ if(!word||!word.cells.length)return false;
+ const index=Math.min(Math.max(crossCursor,0),word.cells.length-1);
+ const [r,c]=word.cells[index];
+ const matches=crossWordEntries().filter(([,candidate])=>candidate.cells.some(([x,y])=>x===r&&y===c)).map(([id])=>id);
+ if(matches.length<2)return false;
+ const activeIndex=matches.indexOf(crossActive);
+ crossActive=matches[(activeIndex+1+matches.length)%matches.length];
+ crossCursor=currentCrossPuzzle().words[crossActive].cells.findIndex(([x,y])=>x===r&&y===c);
+ drawCrossword();
+ return true;
 }
 function crossCellLocked(r,c,wordId){
  return crossWordEntries().some(([otherId,other])=>otherId!==wordId&&crossSolved[otherId]&&other.cells.some(([x,y])=>x===r&&y===c));
@@ -324,6 +356,9 @@ document.addEventListener('keydown',event=>{
  if(!document.getElementById('crossword').classList.contains('active')||event.altKey||event.ctrlKey||event.metaKey)return;
  if(event.key==='Backspace'){event.preventDefault();crossErase();return}
  if(event.key==='Escape'){show('home');return}
+ const boardTarget=event.target?.closest?.('.cross-board-scroll,.cross-cell,.cross-clue');
+ if(event.code==='Space'&&event.target?.closest?.('.cross-cell')){event.preventDefault();crossToggleDirection();return}
+ if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)&&boardTarget&&crossMoveCursor(event.key)){event.preventDefault();return}
  if(Array.from(event.key).length===1&&crossAlphabet.includes(event.key)){event.preventDefault();crossPress(event.key)}
 });
 render();renderLevels();
