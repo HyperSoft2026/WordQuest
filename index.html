@@ -88,14 +88,22 @@ function checkAchievements(){let checks=[['first','البداية القوية',
 function renderAchievements(){let all=[['first','🌟','البداية القوية','أكمل أول مرحلة'],['five','🧠','محب الكلمات','أكمل 5 مراحل'],['ten','👑','عبقري الكلمات','أكمل 10 مراحل']];document.getElementById('achievements-list').innerHTML=all.map(a=>'<div class="list-card"><div style="font-size:27px">'+a[1]+'</div><div class="grow"><b>'+a[2]+'</b><small>'+a[3]+'</small></div><span>'+(state.achievements.includes(a[0])?'✅':'🔒')+'</span></div>').join('')}
 function toast(s){let t=document.getElementById('toast');t.textContent=s;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2100)}
 function closeModal(){document.getElementById('modal').classList.remove('show')}
+function nextIncompleteCrossPuzzleIndex(){
+ for(let offset=1;offset<crosswordPuzzles.length;offset++){
+  const index=(crossPuzzleIndex+offset)%crosswordPuzzles.length;
+  const puzzle=crosswordPuzzles[index],saved=state.crosswordProgress?.[puzzle.id]?.solved||{};
+  if(!Object.keys(puzzle.words).every(id=>!!saved[id]))return index;
+ }
+ return -1;
+}
 function showCrossCompletion(){
- const puzzle=currentCrossPuzzle();
+ const puzzle=currentCrossPuzzle(),nextIndex=nextIncompleteCrossPuzzleIndex();
  document.getElementById('modal-icon').textContent='🎉';
  document.getElementById('modal-title').textContent='أكملت شبكة الكلمات!';
- document.getElementById('modal-copy').textContent='أتممت جميع كلمات «'+puzzle.title+'». يمكنك اختيار شبكة أخرى ومواصلة التحدي.';
+ document.getElementById('modal-copy').textContent='أتممت جميع كلمات «'+puzzle.title+'». '+(nextIndex>=0?'يمكنك الانتقال مباشرة إلى الشبكة التالية غير المكتملة.':'أكملت جميع الشبكات المتاحة!');
  const button=document.getElementById('modal-btn');
- button.textContent='متابعة الشبكات';
- button.onclick=closeModal;
+ button.textContent=nextIndex>=0?'الشبكة التالية ←':'إنهاء الشبكات';
+ button.onclick=()=>{closeModal();if(nextIndex>=0)crossSwitch(nextIndex);else toast('رائع! أكملت جميع الشبكات المتاحة');};
  document.getElementById('modal').classList.add('show');
 }
 
